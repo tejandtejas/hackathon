@@ -1,0 +1,48 @@
+{
+  "timestamp": "2026-06-26T07:45:00Z",
+  "phase": "deploy-blocked",
+  "deploy_attempts": [
+    {"job_id": "e6283369-bce5-4f00-9227-6131e3bae764", "index": 1, "status": "failed", "error": "dhi.io/python:3.12-debian13-sfw-dev HTTP 500"},
+    {"job_id": "be3d8f31-8149-45a1-97f7-32faed241f5e", "index": 2, "status": "failed", "error": "dhi.io/python:3.12-debian13-sfw-dev HTTP 500"},
+    {"job_id": "456d0b07-46b5-4187-be81-bad5c0c36b65", "index": 3, "status": "failed", "error": "dhi.io/python:3.12-debian13-sfw-dev HTTP 500 — runtime.txt python-3.11.x (ignored, no buildpack)"},
+    {"job_id": "8af11745-7295-44c0-95b4-ee2abfc3c377", "index": 4, "status": "failed", "error": "dhi.io/python:3.12-debian13-sfw-dev HTTP 500 — custom Dockerfile added (platform ignores it, uses generated Dockerfile with buildID=2deaee96)"},
+    {"job_id": "fc93e244-4bb7-40f7-952e-7e0c17332c1f", "index": 5, "status": "failed", "error": "HTTP 409 conflict (stale lock state from prior failures)"},
+    {"job_id": "d1e96eac-762e-44a4-ac3c-ed414cb1e525", "index": 6, "type": "undeploy", "status": "completed", "note": "Cleared lock state"},
+    {"job_id": "c379a2f9-8358-494f-99d7-ceaf185c104c", "index": 7, "status": "failed", "error": "dhi.io/python:3.12-debian13-sfw-dev HTTP 500 — runtime.version: 3.11 in asset.yaml (ignored, platform still uses 3.12 generated Dockerfile)"},
+    {"job_id": "6632057c-64c6-4e00-be32-ec63c34101fc", "index": 8, "status": "failed", "error": "dhi.io/python:3.12-debian13 HTTP 500 — probe attempt to check if cache recovered; buildID=2deaee96 still constant; outage confirmed ongoing as of 2026-06-26T08:03Z"}
+  ],
+  "root_cause": "Platform infrastructure outage: dhi-cache.deployer.svc.cluster.local:5000 returns HTTP 500 for all dhi.io/python:3.12-debian13* manifests. The platform-generated Dockerfile always uses this image and cannot be overridden via runtime.txt, asset.yaml runtime block, or a custom Dockerfile (buildID=2deaee96 is constant across all attempts, confirming the platform ignores user-supplied Dockerfiles).",
+  "workarounds_tried": [
+    "runtime.txt python-3.11.x — no effect (only for buildpack stacks, project uses custom Dockerfile flow)",
+    "Custom Dockerfile FROM python:3.11-slim — ignored by platform (generates its own Dockerfile)",
+    "asset.yaml runtime.version: 3.11 — ignored by platform (still generates FROM dhi.io/python:3.12)"
+  ],
+  "resolution": "Requires SAP Build platform team to fix dhi-cache.deployer.svc.cluster.local:5000 for python:3.12-debian13 image, OR allow users to override the base image via asset.yaml. No user-side workaround is possible with current platform behaviour. Outage confirmed still active as of 2026-06-26T08:03Z (attempt 8).",
+  "cf_push_incidents": [
+    {
+      "date": "2026-06-26",
+      "issue": "langchain version conflict",
+      "fix": "requirements.txt: langchain==1.3.9 → langchain==1.2.10, langgraph==1.2.5 → langgraph==1.0.10 (sap-ai-sdk-gen==6.6.0 requires langchain~=1.2.10)"
+    },
+    {
+      "date": "2026-06-26",
+      "issue": "aicore.py clientSecret casing bug — BTP Destination returns camelCase keys; code used lowercase cfg.get('clientsecret')",
+      "fix": "Added _cfg() case-insensitive helper inside init_llm_from_destination(); all credential lookups go through _cfg()"
+    },
+    {
+      "date": "2026-06-26",
+      "issue": "content filter corruption — _patch.py had cfg.get('clientSecret') redacted to literal [REDACTED]; caused NameError at runtime",
+      "fix": "Replaced [REDACTED] literal with _cfg('clientSecret') via python3 -c string replacement"
+    },
+    {
+      "date": "2026-06-26",
+      "issue": "langgraph ExecutionInfo ImportError — langgraph==1.0.10 lacks ExecutionInfo in langgraph.runtime; needed by langgraph-prebuilt",
+      "fix": "requirements.txt: sap-ai-sdk-gen==6.6.0 → 6.10.0 (resolves langchain~=1.2.14 → langgraph>=1.1.10 which has ExecutionInfo); all 167 tests pass"
+    }
+  ],
+  "agent_status": {
+    "code": "complete",
+    "tests": "167 passing, 72% coverage",
+    "cf_migration": "complete — app/s4hana_client.py, app/aicore.py, app/tools/cf_tools.py, dual-mode agent.py/agent_executor.py/main.py"
+  }
+}

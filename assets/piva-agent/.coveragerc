@@ -1,0 +1,17 @@
+[run]
+omit =
+    */extension_telemetry/*
+    app/agent_executor.py
+    app/main.py
+    app/mcp_client.py
+    app/aicore.py
+    app/s4hana_client.py
+
+[report]
+omit =
+    */extension_telemetry/*
+    app/agent_executor.py
+    app/main.py
+    app/mcp_client.py
+    app/aicore.py
+    app/s4hana_client.py

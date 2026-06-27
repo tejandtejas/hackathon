@@ -1,0 +1,243 @@
+{
+  "servers": {
+    "product-ewm-warehouse": {
+      "mcp_server_name": "OP_PRODUCT_0002/_ProductEWMWarehouse",
+      "description": "SAP EWM Product Master Warehouse View. Provides read access to EWM product master data including cycle counting indicators, counting interval, last physical inventory date, and warehouse assignment.",
+      "tools": {
+        "list_ProductEWMWarehouse": {
+          "description": "Retrieves EWM warehouse view of product master records. Returns CycleCountingIndicator, PhysicalInventoryCycle, LastPhysicalInventoryDate, Product, WarehouseNumber.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "$filter": {
+                "type": "string",
+                "description": "OData filter expression, e.g. \"WarehouseNumber eq '0001'\" or \"WarehouseNumber eq '0001' and CycleCountingIndicator eq 'A'\""
+              },
+              "$select": {
+                "type": "string",
+                "description": "Comma-separated list of fields to return"
+              },
+              "$top": {
+                "type": "integer",
+                "description": "Maximum number of records to return (max 100)",
+                "maximum": 100
+              },
+              "$skip": {
+                "type": "integer",
+                "description": "Number of records to skip for pagination"
+              }
+            }
+          },
+          "mock_response": {
+            "results": [
+              {
+                "Product": "MAT-10001",
+                "WarehouseNumber": "0001",
+                "CycleCountingIndicator": "A",
+                "PhysicalInventoryCycle": "30",
+                "LastPhysicalInventoryDate": "/Date(1704067200000)/",
+                "AnnualAverageStockValue": "12500.00"
+              },
+              {
+                "Product": "MAT-10002",
+                "WarehouseNumber": "0001",
+                "CycleCountingIndicator": "B",
+                "PhysicalInventoryCycle": "90",
+                "LastPhysicalInventoryDate": "/Date(1696118400000)/",
+                "AnnualAverageStockValue": "3200.00"
+              },
+              {
+                "Product": "MAT-10003",
+                "WarehouseNumber": "0001",
+                "CycleCountingIndicator": "C",
+                "PhysicalInventoryCycle": "180",
+                "LastPhysicalInventoryDate": "/Date(1680307200000)/",
+                "AnnualAverageStockValue": "980.00"
+              },
+              {
+                "Product": "MAT-10004",
+                "WarehouseNumber": "0001",
+                "CycleCountingIndicator": "",
+                "PhysicalInventoryCycle": "",
+                "LastPhysicalInventoryDate": null,
+                "AnnualAverageStockValue": "450.00"
+              },
+              {
+                "Product": "MAT-10005",
+                "WarehouseNumber": "0001",
+                "CycleCountingIndicator": "A",
+                "PhysicalInventoryCycle": "30",
+                "LastPhysicalInventoryDate": null,
+                "AnnualAverageStockValue": "7800.00"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "whse-physical-inventory-doc": {
+      "mcp_server_name": "OP_WHSEPHYSICALINVENTORYDOC_0001",
+      "description": "SAP EWM Warehouse Physical Inventory Document API (A2X). Supports creating physical inventory documents, reading document headers and items with counted/booked quantities, and posting stock differences.",
+      "tools": {
+        "list_WarehousePhysicalInventoryDoc": {
+          "description": "Reads EWM physical inventory document headers. Filterable by warehouse number, document status, and fiscal year.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "$filter": {
+                "type": "string",
+                "description": "OData filter, e.g. \"WarehouseNumber eq '0001' and InventoryDocumentStatus eq 'COUNTED'\""
+              },
+              "$select": { "type": "string" },
+              "$top": { "type": "integer", "maximum": 100 },
+              "$skip": { "type": "integer" },
+              "$expand": { "type": "string" }
+            }
+          },
+          "mock_response": {
+            "results": [
+              {
+                "InventoryDocument": "0000100001",
+                "FiscalYear": "2026",
+                "WarehouseNumber": "0001",
+                "InventoryDocumentStatus": "COUNTED",
+                "DocumentDate": "/Date(1750550400000)/",
+                "PlannedCountingStartDate": "/Date(1750550400000)/"
+              },
+              {
+                "InventoryDocument": "0000100002",
+                "FiscalYear": "2026",
+                "WarehouseNumber": "0001",
+                "InventoryDocumentStatus": "COUNTED",
+                "DocumentDate": "/Date(1750550400000)/",
+                "PlannedCountingStartDate": "/Date(1750550400000)/"
+              },
+              {
+                "InventoryDocument": "0000100003",
+                "FiscalYear": "2026",
+                "WarehouseNumber": "0001",
+                "InventoryDocumentStatus": "OPEN",
+                "DocumentDate": "/Date(1750636800000)/",
+                "PlannedCountingStartDate": "/Date(1750636800000)/"
+              }
+            ]
+          }
+        },
+        "get_WarehousePhysicalInventoryDocItem": {
+          "description": "Reads individual line items of a physical inventory document. Returns product, storage bin, BookQuantity, CountedQuantity, difference, and status.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "$filter": { "type": "string" },
+              "$select": { "type": "string" },
+              "$top": { "type": "integer", "maximum": 100 },
+              "$skip": { "type": "integer" }
+            }
+          },
+          "mock_response": {
+            "results": [
+              {
+                "InventoryDocument": "0000100001",
+                "FiscalYear": "2026",
+                "InventoryDocumentItem": "0001",
+                "Product": "MAT-10001",
+                "WarehouseNumber": "0001",
+                "StorageBin": "A-01-01",
+                "BookQuantity": "100.000",
+                "CountedQuantity": "101.000",
+                "QuantityInBaseUnit": "EA",
+                "InventoryDocumentItemStatus": "COUNTED"
+              },
+              {
+                "InventoryDocument": "0000100001",
+                "FiscalYear": "2026",
+                "InventoryDocumentItem": "0002",
+                "Product": "MAT-10002",
+                "WarehouseNumber": "0001",
+                "StorageBin": "A-01-02",
+                "BookQuantity": "200.000",
+                "CountedQuantity": "195.000",
+                "QuantityInBaseUnit": "EA",
+                "InventoryDocumentItemStatus": "COUNTED"
+              },
+              {
+                "InventoryDocument": "0000100002",
+                "FiscalYear": "2026",
+                "InventoryDocumentItem": "0001",
+                "Product": "MAT-10003",
+                "WarehouseNumber": "0001",
+                "StorageBin": "B-02-03",
+                "BookQuantity": "50.000",
+                "CountedQuantity": "40.000",
+                "QuantityInBaseUnit": "EA",
+                "InventoryDocumentItemStatus": "COUNTED"
+              }
+            ]
+          }
+        },
+        "create_WarehousePhysicalInventoryDoc": {
+          "description": "Creates a new EWM physical inventory document for a product in a warehouse. WRITE operation — must only be called after explicit user confirmation.",
+          "input_schema": {
+            "type": "object",
+            "required": ["WarehouseNumber", "Product"],
+            "properties": {
+              "WarehouseNumber": { "type": "string" },
+              "Product": { "type": "string" },
+              "StorageBin": { "type": "string" },
+              "PlannedCountingStartDate": { "type": "string", "format": "date" }
+            }
+          },
+          "mock_response": {
+            "InventoryDocument": "0000100010",
+            "FiscalYear": "2026",
+            "WarehouseNumber": "0001",
+            "Product": "MAT-10001",
+            "InventoryDocumentStatus": "OPEN",
+            "DocumentDate": "/Date(1750723200000)/"
+          }
+        },
+        "post_PhysicalInventoryDifference": {
+          "description": "Posts the stock difference for a physical inventory document. WRITE/HIGH-RISK operation — must only be called after explicit user confirmation. Irreversible.",
+          "input_schema": {
+            "type": "object",
+            "required": ["InventoryDocument", "FiscalYear"],
+            "properties": {
+              "InventoryDocument": { "type": "string" },
+              "FiscalYear": { "type": "string" },
+              "Items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "InventoryDocumentItem": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "mock_response": {
+            "InventoryDocument": "0000100001",
+            "FiscalYear": "2026",
+            "PostingStatus": "POSTED",
+            "PostingDate": "/Date(1750723200000)/",
+            "MaterialDocument": "4900000001",
+            "MaterialDocumentYear": "2026"
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "created_for_agent": "piva-agent",
+    "mock_mode": true,
+    "deterministic": true,
+    "total_servers": 2,
+    "total_tools": 5,
+    "generated_from": [
+      "specification/piva-agent/mcp-specs/mcp-spec-product-ewm-warehouse.json",
+      "specification/piva-agent/mcp-specs/mcp-spec-whse-physical-inventory-doc.json"
+    ],
+    "generation_date": "2026-06-25"
+  }
+}

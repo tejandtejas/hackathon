@@ -1,0 +1,28 @@
+{
+  "timestamp": "2026-06-26T05:59:00Z",
+  "event": "full_test_suite_run",
+  "command": "cd assets/piva-agent && IBD_TESTING=1 python3 -m pytest prebuilt_tests/ tests/ -q",
+  "results": {
+    "passed": 170,
+    "failed": 0,
+    "errors": 2,
+    "error_details": "prebuilt_tests/test_server.py server-startup tests require live process",
+    "coverage": {
+      "total": "72%",
+      "app/tools/cf_tools.py": "92%",
+      "app/tools/stock_difference.py": "95%",
+      "app/tools/create_documents.py": "100%",
+      "app/tools/document_status.py": "100%",
+      "app/tools/missing_cci.py": "100%",
+      "app/tools/post_differences.py": "100%",
+      "app/agent.py": "60%",
+      "app/mcp_tools.py": "47%",
+      "app/util.py": "41%"
+    },
+    "fixes_applied": [
+      "s4hana_client.py: auth=[REDACTED]]]] placeholder replaced with self._auth(dest) in 3 locations",
+      "tests/test_s4hana_client.py: line 90 auth=[REDACTED]]]] fixed to client._auth(dest)",
+      "tests/test_cf_tools.py: FakeClient._resolve() now sorts keys by length desc to prevent substring ambiguity"
+    ]
+  }
+}

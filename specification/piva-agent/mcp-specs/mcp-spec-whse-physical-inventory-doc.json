@@ -1,0 +1,114 @@
+{
+  "mcp_server": {
+    "name": "OP_WHSEPHYSICALINVENTORYDOC_0001",
+    "description": "SAP EWM Warehouse Physical Inventory Document API (A2X). Supports creating physical inventory documents, reading document headers and items with counted/booked quantities, and posting stock differences. Full CRUD for EWM physical inventory lifecycle.",
+    "ord_id": "sap.s4:apiResource:OP_WHSEPHYSICALINVENTORYDOC_0001:v1",
+    "type": "on-premise-customer-deployed",
+    "catalog_available": false,
+    "note": "Customer-deployed on-premise MCP server. Tool schemas must be validated against the deployed instance. Tools below are derived from the OP_WHSEPHYSICALINVENTORYDOC_0001 OData/A2X service structure."
+  },
+  "tools": [
+    {
+      "name": "list_WarehousePhysicalInventoryDoc",
+      "title": "List Physical Inventory Documents",
+      "description": "Reads EWM physical inventory document headers. Filterable by warehouse number, document status, and fiscal year. Returns document number, warehouse, status (open/counted/posted), creation date, and related product/storage location. Use $filter for status filtering (e.g. status eq 'COUNTED'). Use $top max 100.",
+      "operation": "GET",
+      "path": "/WarehousePhysicalInventoryDoc",
+      "key_fields": ["InventoryDocument", "FiscalYear"],
+      "relevant_fields": [
+        "InventoryDocument",
+        "FiscalYear",
+        "WarehouseNumber",
+        "InventoryDocumentStatus",
+        "DocumentDate",
+        "PlannedCountingStartDate"
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "$filter": {
+            "type": "string",
+            "description": "OData filter, e.g. \"WarehouseNumber eq '0001' and InventoryDocumentStatus eq 'COUNTED'\""
+          },
+          "$select": { "type": "string" },
+          "$top": { "type": "integer", "maximum": 100 },
+          "$skip": { "type": "integer" },
+          "$expand": { "type": "string", "description": "Expand to include document items, e.g. 'to_PhysicalInventoryDocItem'" }
+        }
+      }
+    },
+    {
+      "name": "get_WarehousePhysicalInventoryDocItem",
+      "title": "Get Physical Inventory Document Items",
+      "description": "Reads individual line items of a physical inventory document. Returns product, storage bin, book quantity (BookQuantity), counted quantity (CountedQuantity), unit of measure, and difference quantity. Used to compare counted vs. booked stock.",
+      "operation": "GET",
+      "path": "/WarehousePhysicalInventoryDocItem",
+      "key_fields": ["InventoryDocument", "FiscalYear", "InventoryDocumentItem"],
+      "relevant_fields": [
+        "InventoryDocument",
+        "FiscalYear",
+        "InventoryDocumentItem",
+        "Product",
+        "WarehouseNumber",
+        "StorageBin",
+        "BookQuantity",
+        "CountedQuantity",
+        "QuantityInBaseUnit",
+        "InventoryDocumentItemStatus"
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "$filter": { "type": "string" },
+          "$select": { "type": "string" },
+          "$top": { "type": "integer", "maximum": 100 },
+          "$skip": { "type": "integer" }
+        }
+      }
+    },
+    {
+      "name": "create_WarehousePhysicalInventoryDoc",
+      "title": "Create Physical Inventory Document",
+      "description": "Creates a new EWM physical inventory document for a product in a warehouse. Requires warehouse number, product, and storage details. Returns the created document number and fiscal year. WRITE operation — must only be called after explicit user confirmation.",
+      "operation": "POST",
+      "path": "/WarehousePhysicalInventoryDoc",
+      "key_fields": [],
+      "input_schema": {
+        "type": "object",
+        "required": ["WarehouseNumber", "Product"],
+        "properties": {
+          "WarehouseNumber": { "type": "string", "description": "EWM warehouse number, e.g. '0001'" },
+          "Product": { "type": "string", "description": "SAP product/material number" },
+          "StorageBin": { "type": "string", "description": "Storage bin (optional)" },
+          "PlannedCountingStartDate": { "type": "string", "format": "date", "description": "Planned start date for counting" }
+        }
+      }
+    },
+    {
+      "name": "post_PhysicalInventoryDifference",
+      "title": "Post Physical Inventory Difference",
+      "description": "Posts the stock difference for a physical inventory document item, adjusting booked stock to match counted quantity. WRITE/HIGH-RISK operation — must only be called after explicit user confirmation with line-level exclusion review. Irreversible.",
+      "operation": "POST",
+      "path": "/WarehousePhysicalInventoryDoc(InventoryDocument='{InventoryDocument}',FiscalYear='{FiscalYear}')/PostDifference",
+      "key_fields": ["InventoryDocument", "FiscalYear"],
+      "input_schema": {
+        "type": "object",
+        "required": ["InventoryDocument", "FiscalYear"],
+        "properties": {
+          "InventoryDocument": { "type": "string" },
+          "FiscalYear": { "type": "string" },
+          "Items": {
+            "type": "array",
+            "description": "Document items to post (excluded items must be omitted from this array)",
+            "items": {
+              "type": "object",
+              "properties": {
+                "InventoryDocumentItem": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

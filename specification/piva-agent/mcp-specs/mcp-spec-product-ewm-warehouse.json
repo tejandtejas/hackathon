@@ -1,0 +1,51 @@
+{
+  "mcp_server": {
+    "name": "OP_PRODUCT_0002/_ProductEWMWarehouse",
+    "description": "SAP EWM Product Master - Warehouse View. Provides read access to EWM product master data including cycle counting indicators, counting frequency/interval, last physical inventory date, and warehouse assignment.",
+    "ord_id": "sap.s4:apiResource:OP_PRODUCT_0002:v1",
+    "entity": "_ProductEWMWarehouse",
+    "type": "on-premise-customer-deployed",
+    "catalog_available": false,
+    "note": "Customer-deployed on-premise MCP server. Tool schemas must be validated against the deployed instance. The tools below are derived from the OP_PRODUCT_0002 OData service structure."
+  },
+  "tools": [
+    {
+      "name": "list_ProductEWMWarehouse",
+      "title": "List EWM Warehouse Products",
+      "description": "Retrieves EWM warehouse view of product master records. Returns cycle counting indicator (CycleCountingIndicator), physical inventory cycle (PhysicalInventoryCycle/interval), last physical inventory date (LastPhysicalInventoryDate), product number, and warehouse number. Use $filter for warehouse and CCI filtering. Use $top to limit results (max 100).",
+      "operation": "GET",
+      "path": "/_ProductEWMWarehouse",
+      "key_fields": ["Product", "WarehouseNumber"],
+      "relevant_fields": [
+        "Product",
+        "WarehouseNumber",
+        "CycleCountingIndicator",
+        "PhysicalInventoryCycle",
+        "LastPhysicalInventoryDate",
+        "AnnualAverageStockValue"
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "$filter": {
+            "type": "string",
+            "description": "OData filter expression, e.g. \"WarehouseNumber eq '0001'\" or \"WarehouseNumber eq '0001' and CycleCountingIndicator eq 'A'\""
+          },
+          "$select": {
+            "type": "string",
+            "description": "Comma-separated list of fields to return"
+          },
+          "$top": {
+            "type": "integer",
+            "description": "Maximum number of records to return (max 100)",
+            "maximum": 100
+          },
+          "$skip": {
+            "type": "integer",
+            "description": "Number of records to skip for pagination"
+          }
+        }
+      }
+    }
+  ]
+}

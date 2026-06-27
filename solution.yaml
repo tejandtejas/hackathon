@@ -1,0 +1,10 @@
+apiVersion: solution.sap/v1
+kind: Solution
+
+metadata:
+  name: piva-eeddf
+  version: 1.0.0
+  description: Physical Inventory Verification Agent — EWM physical inventory cycle orchestration via natural language in SAP Joule
+
+assets:
+  - ref: ./assets/piva-agent/asset.yaml

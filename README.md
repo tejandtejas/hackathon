@@ -1,2 +1,0 @@
-# hackathon
-Project Vector Hackathon
